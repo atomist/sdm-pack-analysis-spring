@@ -1,8 +1,8 @@
-# `sdm-pack-analysis-spring`
+# `@atomist/sdm-pack-analysis-spring`
 
-`sdm-pack-analysis-spring` is licensed under Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
+`@atomist/sdm-pack-analysis-spring` is licensed under Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-This page details all runtime OSS dependencies of `sdm-pack-analysis-spring`.
+This page details all runtime OSS dependencies of `@atomist/sdm-pack-analysis-spring`.
 
 ## Licenses
 
