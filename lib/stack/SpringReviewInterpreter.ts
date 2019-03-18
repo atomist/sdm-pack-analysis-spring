@@ -27,12 +27,12 @@ import {
     HardcodedPropertyReviewer,
     ImportDotStarReviewer,
     ImportIoFileReviewer,
+    MutableInjectionsReviewer,
+    NonSpecificMvcAnnotationsReviewer,
+    OldSpringBootVersionReviewer,
     ProvidedDependencyReviewer,
+    UnnecessaryComponentScanReviewer,
 } from "@atomist/sdm-pack-spring";
-import { NonSpecificMvcAnnotationsReviewer } from "@atomist/sdm-pack-spring/lib/spring/review/findNonSpecificMvcAnnotations";
-import { MutableInjectionsReviewer } from "@atomist/sdm-pack-spring/lib/spring/review/mutableInjectionsReviewer";
-import { OldSpringBootVersionReviewer } from "@atomist/sdm-pack-spring/lib/spring/review/oldSpringBootVersionReviewer";
-import { UnnecessaryComponentScanReviewer } from "@atomist/sdm-pack-spring/lib/spring/transform/removeUnnecessaryComponentScanAnnotations";
 /**
  * Review every push with the given inspections, based on configuration
  */
