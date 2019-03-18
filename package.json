@@ -22,8 +22,9 @@
   "main": "./index.js",
   "types": "./index.d.ts",
   "dependencies": {
-    "@atomist/sdm-pack-spring": "^1.1.0",
-    "@atomist/sdm-pack-build": "^1.0.3"
+    "@atomist/sdm-pack-build": "^1.0.3",
+    "@atomist/sdm-pack-spring": "^1.1.1-master.20190314165126",
+    "lodash": "^4.17.11"
   },
   "peerDependencies": {
     "@atomist/automation-client": "*",

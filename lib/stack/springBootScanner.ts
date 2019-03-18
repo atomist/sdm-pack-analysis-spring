@@ -18,9 +18,11 @@ import {
     TechnologyScanner,
     TechnologyStack,
 } from "@atomist/sdm-pack-analysis";
-import { HasSpringBootPom } from "@atomist/sdm-pack-spring";
-import { SpringBootProjectStructure } from "@atomist/sdm-pack-spring/lib/spring/generate/SpringBootProjectStructure";
-import { SpringBootVersionInspection } from "@atomist/sdm-pack-spring/lib/spring/inspect/springBootVersionInspection";
+import {
+    HasSpringBootPom,
+    SpringBootProjectStructure,
+    SpringBootVersionInspection,
+} from "@atomist/sdm-pack-spring";
 
 export interface SpringBootStack extends TechnologyStack {
 
