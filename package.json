@@ -1,6 +1,6 @@
 {
   "name": "@atomist/sdm-pack-analysis-spring",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Spring support for SDM analysis pack",
   "author": "Atomist",
   "license": "Apache-2.0",
