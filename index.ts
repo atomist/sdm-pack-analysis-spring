@@ -15,3 +15,4 @@
  */
 
 export { springBootStackSupport } from "./lib/stack/springBootStackSupport";
+export { springBootScanner } from "./lib/stack/springBootScanner";
