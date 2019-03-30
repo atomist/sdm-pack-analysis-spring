@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://images.atomist.com/sdm/SDM-Logo-Dark.png">
-</p>
-
 # @atomist-seeds/sdm-pack-analysis-spring
 
 This pack contains interpreters and scanners, adding Spring stack support to
