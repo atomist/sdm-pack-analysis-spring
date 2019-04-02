@@ -28,10 +28,15 @@ import {
     Interpreter,
 } from "@atomist/sdm-pack-analysis";
 import { Build } from "@atomist/sdm-pack-build";
+import { DockerBuild } from "@atomist/sdm-pack-docker";
 import {
+    GradleBuild,
+    GradleVersion,
     mavenBuilder,
     MavenDefaultOptions,
     MavenProjectVersioner,
+    MvnPackage,
+    MvnVersion,
 } from "@atomist/sdm-pack-spring";
 import { BuildSystemStack } from "./buildSystemScanner";
 
@@ -54,6 +59,12 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
             versioner: MavenProjectVersioner,
         });
 
+    private readonly dockerBuildGoal: DockerBuild = new DockerBuild()
+        .with({
+        })
+        .with(MvnVersion)
+        .with(MvnPackage);
+
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
         if (buildSystemStack.buildSystem !== "maven") {
@@ -62,7 +73,10 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
         interpretation.buildGoals = goals("build")
             .plan(this.mavenVersionGoal)
             .plan(this.mavenBuildGoal).after(this.mavenVersionGoal);
-
+        if (buildSystemStack.hasDockerFile) {
+            interpretation.containerBuildGoals = goals("build")
+                .plan(this.dockerBuildGoal);
+        }
         interpretation.materialChangePushTests.push(isMaterialChange({
             extensions: ["java", "kt", "kts", "xml", "properties", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],
