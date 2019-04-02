@@ -62,8 +62,8 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
     private readonly dockerBuildGoal: DockerBuild = new DockerBuild()
         .with({
         })
-        .with(MvnVersion)
-        .with(MvnPackage);
+        .withProjectListener(MvnVersion)
+        .withProjectListener(MvnPackage);
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
@@ -74,7 +74,7 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
             .plan(this.mavenVersionGoal)
             .plan(this.mavenBuildGoal).after(this.mavenVersionGoal);
         if (buildSystemStack.hasDockerFile) {
-            interpretation.containerBuildGoals = goals("build")
+            interpretation.containerBuildGoals = goals("docker-build")
                 .plan(this.dockerBuildGoal);
         }
         interpretation.materialChangePushTests.push(isMaterialChange({

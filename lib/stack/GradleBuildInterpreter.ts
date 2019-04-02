@@ -62,8 +62,8 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
     private readonly dockerBuildGoal: DockerBuild = new DockerBuild()
         .with({
         })
-        .with(GradleVersion)
-        .with(GradleBuild);
+        .withProjectListener(GradleVersion)
+        .withProjectListener(GradleBuild);
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
@@ -75,7 +75,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
             .plan(this.gradleVersionGoal)
             .plan(this.gradleBuildGoal).after(this.gradleVersionGoal);
         if (buildSystemStack.hasDockerFile) {
-            interpretation.containerBuildGoals = goals("build")
+            interpretation.containerBuildGoals = goals("docker-build")
                 .plan(this.dockerBuildGoal);
         }
         interpretation.buildGoals = buildGoals;
