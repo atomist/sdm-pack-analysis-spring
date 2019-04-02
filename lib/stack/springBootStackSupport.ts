@@ -23,8 +23,8 @@ import * as _ from "lodash";
 import { buildSystemScanner } from "./buildSystemScanner";
 import { GradleBuildInterpreter } from "./GradleBuildInterpreter";
 import { MavenBuildInterpreter } from "./MavenBuildInterpreter";
+import { SpringBootMavenTransformRecipeContributor } from "./SpringBootMavenTransformRecipeContributor";
 import { springBootScanner } from "./springBootScanner";
-import { SpringBootTransformRecipeContributor } from "./SpringBootTransformRecipeContributor";
 import { SpringReviewInterpreter } from "./SpringReviewInterpreter";
 
 export interface SpringBootStackSupportOptions {
@@ -70,9 +70,9 @@ export function springBootStackSupport(configuration: SoftwareDeliveryMachineCon
             new SpringReviewInterpreter(reviewCategories),
         ],
         transformRecipeContributors: [{
-            originator: "spring-boot",
+            originator: "spring-boot-maven",
             optional: false,
-            contributor: new SpringBootTransformRecipeContributor(),
+            contributor: new SpringBootMavenTransformRecipeContributor(),
         }],
         condition: opts.condition,
     };

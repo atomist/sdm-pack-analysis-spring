@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { projectUtils } from "@atomist/automation-client";
 import {
     TechnologyScanner,
     TechnologyStack,
@@ -23,19 +24,40 @@ import {
 } from "@atomist/sdm-pack-spring";
 import { IsGradle } from "@atomist/sdm-pack-spring/lib/gradle/pushtest/gradlePushTests";
 
+/**
+ * Stack information on the used build system. Currently supports Gradle and Maven.
+ */
 export interface BuildSystemStack extends TechnologyStack {
 
     name: "javabuild";
 
     /**
-     * Version of Spring Boot in use
+     * Which build system is used.
      */
     buildSystem: "maven"|"gradle";
+
+    /**
+     * Whether the project has a dockerfile
+     */
+    hasDockerFile: boolean;
+
+    /**
+     * The location of the dockerfile
+     */
+    dockerFile: string;
 }
 
+/**
+ * Scanner that adds build system information to the interpretation.
+ * @param p The project to be scanned.
+ */
 export const buildSystemScanner: TechnologyScanner<BuildSystemStack> = async p => {
     const isMaven = await IsMaven.predicate(p);
     const isGradle = await IsGradle.predicate(p);
+    let dockerFile: string;
+    await projectUtils.doWithFiles(p, "**/Dockerfile", f => {
+        dockerFile = f.path;
+    });
 
     if (!isMaven && !isGradle) {
         return undefined;
@@ -45,6 +67,8 @@ export const buildSystemScanner: TechnologyScanner<BuildSystemStack> = async p =
         name: "javabuild",
         buildSystem: isGradle ? "gradle" : "maven",
         tags: isGradle ? ["gradle"] : ["maven"],
+        hasDockerFile: !!dockerFile,
+        dockerFile,
     };
     return stack;
 };

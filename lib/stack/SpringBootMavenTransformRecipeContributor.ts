@@ -31,9 +31,9 @@ import {
 } from "@atomist/sdm-pack-spring";
 
 /**
- * Add transform for package.json identification
+ * Add transform for pom.xml identification
  */
-export class SpringBootTransformRecipeContributor implements TransformRecipeContributor {
+export class SpringBootMavenTransformRecipeContributor implements TransformRecipeContributor {
 
     public async analyze(p: Project, analysis: ProjectAnalysis, sdmContext: SdmContext): Promise<TransformRecipe | undefined> {
         const parameters: NamedParameter[] = [];

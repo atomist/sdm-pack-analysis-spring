@@ -18,10 +18,9 @@ import {
     AutofixRegistration,
     CodeInspectionRegistration,
     goals,
-    Goals,
-    GoalsBuilder,
     isMaterialChange,
 } from "@atomist/sdm";
+import { Version } from "@atomist/sdm-core";
 import {
     AutofixRegisteringInterpreter,
     CodeInspectionRegisteringInterpreter,
@@ -32,9 +31,14 @@ import { Build } from "@atomist/sdm-pack-build";
 import {
     mavenBuilder,
     MavenDefaultOptions,
+    MavenProjectVersioner,
 } from "@atomist/sdm-pack-spring";
 import { BuildSystemStack } from "./buildSystemScanner";
 
+/**
+ * Interpreter that adds a Maven build goal when Maven is found in the project's interpretation.
+ * @see buildSystemScanner
+ */
 export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
     // This includes test goal
@@ -44,26 +48,25 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
             builder: mavenBuilder(),
         });
 
+    private readonly mavenVersionGoal: Version = new Version()
+        .with({
+            ...MavenDefaultOptions,
+            versioner: MavenProjectVersioner,
+        });
+
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
         if (buildSystemStack.buildSystem !== "maven") {
             return false;
         }
         interpretation.buildGoals = goals("build")
-        // .plan(this.versionGoal)
-            .plan(this.mavenBuildGoal); // .after(this.versionGoal);
-
-        let checkGoals: Goals & GoalsBuilder = goals("checks");
-        if (!!interpretation.checkGoals) {
-            checkGoals = goals("checks").plan(interpretation.checkGoals).plan(interpretation.checkGoals);
-        }
-        interpretation.checkGoals = checkGoals;
+            .plan(this.mavenVersionGoal)
+            .plan(this.mavenBuildGoal).after(this.mavenVersionGoal);
 
         interpretation.materialChangePushTests.push(isMaterialChange({
             extensions: ["java", "kt", "kts", "xml", "properties", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],
         }));
-
         return true;
     }
 

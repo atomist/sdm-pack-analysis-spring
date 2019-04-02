@@ -34,7 +34,7 @@ import {
     UnnecessaryComponentScanReviewer,
 } from "@atomist/sdm-pack-spring";
 /**
- * Review every push with the given inspections, based on configuration
+ * Review every push with with Spring specific inspections.
  */
 export class SpringReviewInterpreter implements Interpreter {
 

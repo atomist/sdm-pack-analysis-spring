@@ -18,10 +18,9 @@ import {
     AutofixRegistration,
     CodeInspectionRegistration,
     goals,
-    Goals,
-    GoalsBuilder,
     isMaterialChange,
 } from "@atomist/sdm";
+import { Version } from "@atomist/sdm-core";
 import {
     AutofixRegisteringInterpreter,
     CodeInspectionRegisteringInterpreter,
@@ -29,41 +28,61 @@ import {
     Interpreter,
 } from "@atomist/sdm-pack-analysis";
 import { Build } from "@atomist/sdm-pack-build";
+import { DockerBuild } from "@atomist/sdm-pack-docker";
 import {
     gradleBuilder,
 } from "@atomist/sdm-pack-spring";
-import { GradleDefaultOptions } from "@atomist/sdm-pack-spring/lib/gradle/build/helpers";
+import {
+    GradleBuild,
+    GradleDefaultOptions,
+    GradleProjectVersioner,
+    GradleVersion,
+} from "@atomist/sdm-pack-spring/lib/gradle/build/helpers";
 import { BuildSystemStack } from "./buildSystemScanner";
 
+/**
+ * Interpreter that adds a gradle build goal when Gradle is found in the project's interpretation.
+ * @see buildSystemScanner
+ */
 export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
     // This includes test goal
-    private readonly mavenBuildGoal: Build = new Build()
+    private readonly gradleBuildGoal: Build = new Build()
         .with({
             ...GradleDefaultOptions,
             builder: gradleBuilder(),
         });
+
+    private readonly gradleVersionGoal: Version = new Version()
+        .with({
+            ...GradleDefaultOptions,
+            versioner: GradleProjectVersioner,
+        });
+
+    private readonly dockerBuildGoal: DockerBuild = new DockerBuild()
+        .with({
+        })
+        .with(GradleVersion)
+        .with(GradleBuild);
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
         if (buildSystemStack.buildSystem !== "gradle") {
             return false;
         }
-        interpretation.buildGoals = goals("build")
-        // .plan(this.versionGoal)
-            .plan(this.mavenBuildGoal); // .after(this.versionGoal);
-
-        let checkGoals: Goals & GoalsBuilder = goals("checks");
-        if (!!interpretation.checkGoals) {
-            checkGoals = goals("checks").plan(interpretation.checkGoals).plan(interpretation.checkGoals);
+        const buildGoals = goals("build")
+            .plan(this.gradleVersionGoal)
+            .plan(this.gradleVersionGoal)
+            .plan(this.gradleBuildGoal).after(this.gradleVersionGoal);
+        if (buildSystemStack.hasDockerFile) {
+            interpretation.containerBuildGoals = goals("build")
+                .plan(this.dockerBuildGoal);
         }
-        interpretation.checkGoals = checkGoals;
-
+        interpretation.buildGoals = buildGoals;
         interpretation.materialChangePushTests.push(isMaterialChange({
             extensions: ["java", "kt", "kts", "xml", "properties", "gradle", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],
         }));
-
         return true;
     }
 
