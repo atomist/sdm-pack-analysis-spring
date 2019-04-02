@@ -19,8 +19,8 @@ import {
     SdmContext,
 } from "@atomist/sdm";
 import {
-    CodeInspectionRegisteringInterpreter,
     Interpretation,
+    Interpreter,
 } from "@atomist/sdm-pack-analysis";
 import {
     Categories,
@@ -36,29 +36,34 @@ import {
 /**
  * Review every push with the given inspections, based on configuration
  */
-export class SpringReviewInterpreter implements CodeInspectionRegisteringInterpreter {
+export class SpringReviewInterpreter implements Interpreter {
 
-    public readonly codeInspections: Array<AutoInspectRegistration<any, any>>;
+    public readonly categories: Categories;
 
     public async enrich(interpretation: Interpretation, sdmContext: SdmContext): Promise<boolean> {
-        interpretation.inspections.push(...this.codeInspections);
+        interpretation.inspections.push(...this.getCodeInspections());
         return true;
     }
 
+    public getCodeInspections(): Array<AutoInspectRegistration<any, any>> {
+        const codeInspections: Array<AutoInspectRegistration<any, any>> = [];
+        if (this.categories.cloudNative) {
+            codeInspections.push(ImportIoFileReviewer);
+            codeInspections.push(ImportDotStarReviewer);
+            codeInspections.push(HardcodedPropertyReviewer);
+            codeInspections.push(ProvidedDependencyReviewer);
+        }
+        if (this.categories.springStyle) {
+            codeInspections.push(OldSpringBootVersionReviewer);
+            codeInspections.push(UnnecessaryComponentScanReviewer);
+            codeInspections.push(MutableInjectionsReviewer);
+            codeInspections.push(NonSpecificMvcAnnotationsReviewer);
+        }
+        return codeInspections;
+    }
+
     public constructor(categories: Categories) {
-        this.codeInspections = [];
-        if (categories.cloudNative) {
-            this.codeInspections.push(ImportIoFileReviewer);
-            this.codeInspections.push(ImportDotStarReviewer);
-            this.codeInspections.push(HardcodedPropertyReviewer);
-            this.codeInspections.push(ProvidedDependencyReviewer);
-        }
-        if (categories.springStyle) {
-            this.codeInspections.push(OldSpringBootVersionReviewer);
-            this.codeInspections.push(UnnecessaryComponentScanReviewer);
-            this.codeInspections.push(MutableInjectionsReviewer);
-            this.codeInspections.push(NonSpecificMvcAnnotationsReviewer);
-        }
+        this.categories = categories;
     }
 
 }

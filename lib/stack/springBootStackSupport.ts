@@ -20,8 +20,9 @@ import { StackSupport } from "@atomist/sdm-pack-analysis";
 import { RunCondition } from "@atomist/sdm-pack-analysis/lib/analysis/ProjectAnalyzer";
 import { Categories } from "@atomist/sdm-pack-spring";
 import * as _ from "lodash";
-import { MavenPerBranchLocalDeployInterpreter } from "./MavenPerBranchLocalDeployInterpreter";
-import { SpringBootBuildInterpreter } from "./SpringBootBuildInterpreter";
+import { buildSystemScanner } from "./buildSystemScanner";
+import { GradleBuildInterpreter } from "./GradleBuildInterpreter";
+import { MavenBuildInterpreter } from "./MavenBuildInterpreter";
 import { springBootScanner } from "./springBootScanner";
 import { SpringBootTransformRecipeContributor } from "./SpringBootTransformRecipeContributor";
 import { SpringReviewInterpreter } from "./SpringReviewInterpreter";
@@ -37,28 +38,36 @@ export interface SpringBootStackSupportOptions {
 }
 
 /**
+ * Java stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
+ * @return {StackSupport}
+ */
+export function javaSupport(): StackSupport {
+    return {
+        scanners: [buildSystemScanner],
+        interpreters: [
+            new GradleBuildInterpreter(),
+            new MavenBuildInterpreter(),
+        ],
+        transformRecipeContributors: [],
+    };
+}
+
+/**
  * Spring stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
- * Uses sdm.spring.deployLocally and sdm.spring.review
+ * Uses sdm.spring.deployLocally and sdm.spring.review, to be used with the javaSupport stack.
  * @return {StackSupport}
  */
 export function springBootStackSupport(configuration: SoftwareDeliveryMachineConfiguration,
                                        opts: SpringBootStackSupportOptions = {}): StackSupport {
-    const deployLocally = _.get(configuration, "sdm.spring.deployLocally", false);
     const reviewCategories: Categories = _.get(configuration, "sdm.spring.review", {
         springStyle: true,
         cloudNative: true,
     });
-    logger.info("Spring pack: Local deployment is %s", deployLocally ? "ENABLED" : "DISABLED");
     logger.info("Spring pack: Review categories=%j", reviewCategories);
     return {
         scanners: [springBootScanner],
         interpreters: [
             new SpringReviewInterpreter(reviewCategories),
-            new SpringBootBuildInterpreter(),
-            {
-                action: new MavenPerBranchLocalDeployInterpreter(),
-                runWhen: () => deployLocally,
-            },
         ],
         transformRecipeContributors: [{
             originator: "spring-boot",

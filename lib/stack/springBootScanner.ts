@@ -20,6 +20,7 @@ import {
 } from "@atomist/sdm-pack-analysis";
 import {
     HasSpringBootPom,
+    IsMaven,
     SpringBootProjectStructure,
     SpringBootVersionInspection,
 } from "@atomist/sdm-pack-spring";
@@ -40,25 +41,29 @@ export interface SpringBootStack extends TechnologyStack {
 }
 
 export const springBootScanner: TechnologyScanner<SpringBootStack> = async p => {
-    const isBoot = await HasSpringBootPom.predicate(p);
-    if (!isBoot) {
-        return undefined;
-    }
-    const structure = await SpringBootProjectStructure.inferFromJavaOrKotlinSource(p);
-    if (!structure) {
-        return undefined;
-    }
-    const versions = await SpringBootVersionInspection(p, undefined);
+    const isMaven = await IsMaven.predicate(p);
+    if (isMaven) {
+        const isBoot = await HasSpringBootPom.predicate(p);
+        if (!isBoot) {
+            return undefined;
+        }
+        const structure = await SpringBootProjectStructure.inferFromJavaOrKotlinSource(p);
+        if (!structure) {
+            return undefined;
+        }
+        const versions = await SpringBootVersionInspection(p, undefined);
 
-    const stack: SpringBootStack = {
-        // TODO get from Maven POM
-        projectName: structure.applicationClass,
-        name: "springboot",
-        tags: ["spring", "spring-boot"],
-        structure,
-        version: versions.versions.length > 0 ? versions.versions[0].version : undefined,
-        // TODO gather this from properties and YAML
-        referencedEnvironmentVariables: [],
-    };
-    return stack;
+        return {
+            // TODO get from Maven POM
+            projectName: structure.applicationClass,
+            name: "springboot",
+            tags: ["spring", "spring-boot"],
+            structure,
+            version: versions.versions.length > 0 ? versions.versions[0].version : undefined,
+            // TODO gather this from properties and YAML
+            referencedEnvironmentVariables: [],
+        };
+    } else {
+        return undefined;
+    }
 };

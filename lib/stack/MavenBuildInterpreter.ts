@@ -33,37 +33,34 @@ import {
     mavenBuilder,
     MavenDefaultOptions,
 } from "@atomist/sdm-pack-spring";
-import { SpringBootStack } from "./springBootScanner";
+import { BuildSystemStack } from "./buildSystemScanner";
 
-export class SpringBootBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
+export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
     // This includes test goal
-    private readonly buildGoal: Build = new Build().with({
-        ...MavenDefaultOptions,
-        builder: mavenBuilder(),
-    });
+    private readonly mavenBuildGoal: Build = new Build()
+        .with({
+            ...MavenDefaultOptions,
+            builder: mavenBuilder(),
+        });
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
-        const springBootStack = interpretation.reason.analysis.elements.springboot as SpringBootStack;
-        if (!springBootStack) {
+        const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
+        if (buildSystemStack.buildSystem !== "maven") {
             return false;
         }
-
         interpretation.buildGoals = goals("build")
-            // .plan(this.versionGoal)
-            .plan(this.buildGoal); // .after(this.versionGoal);
+        // .plan(this.versionGoal)
+            .plan(this.mavenBuildGoal); // .after(this.versionGoal);
 
         let checkGoals: Goals & GoalsBuilder = goals("checks");
         if (!!interpretation.checkGoals) {
             checkGoals = goals("checks").plan(interpretation.checkGoals).plan(interpretation.checkGoals);
         }
-        // checkGoals.plan(this.fingerprintGoal);
         interpretation.checkGoals = checkGoals;
 
-        // interpretation.autofixes.push(PackageJsonFormattingAutofix);
-
         interpretation.materialChangePushTests.push(isMaterialChange({
-            extensions: ["java", "kt", "xml", "properties", "yml", "json", "pug", "html", "css", "Dockerfile"],
+            extensions: ["java", "kt", "kts", "xml", "properties", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],
         }));
 
