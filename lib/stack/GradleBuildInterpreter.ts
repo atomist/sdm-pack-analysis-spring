@@ -38,6 +38,7 @@ import {
     GradleProjectVersioner,
     GradleVersion,
 } from "@atomist/sdm-pack-spring/lib/gradle/build/helpers";
+import { HasVersionDefinedInGradleProperties } from "@atomist/sdm-pack-spring/lib/gradle/review/hasGradleVersion";
 import { BuildSystemStack } from "./buildSystemScanner";
 
 /**
@@ -91,6 +92,8 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
     }
 
     get codeInspections(): Array<CodeInspectionRegistration<any>> {
-        return [];
+        return [
+            HasVersionDefinedInGradleProperties,
+        ];
     }
 }
