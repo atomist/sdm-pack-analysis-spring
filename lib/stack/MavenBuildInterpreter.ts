@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import { projectUtils } from "@atomist/automation-client";
 import {
     AutofixRegistration,
     CodeInspectionRegistration,
     goals,
     isMaterialChange,
+    LogSuppressor,
 } from "@atomist/sdm";
 import { Version } from "@atomist/sdm-core";
 import {
@@ -28,10 +30,11 @@ import {
     Interpreter,
 } from "@atomist/sdm-pack-analysis";
 import { Build } from "@atomist/sdm-pack-build";
-import { DockerBuild } from "@atomist/sdm-pack-docker";
 import {
-    GradleBuild,
-    GradleVersion,
+    DockerBuild,
+    DockerProgressReporter,
+} from "@atomist/sdm-pack-docker";
+import {
     mavenBuilder,
     MavenDefaultOptions,
     MavenProjectVersioner,
@@ -61,6 +64,17 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
 
     private readonly dockerBuildGoal: DockerBuild = new DockerBuild()
         .with({
+            progressReporter: DockerProgressReporter,
+            logInterpreter: LogSuppressor,
+            options: {
+                dockerfileFinder: async p => {
+                    let dockerfile: string = "Dockerfile";
+                    await projectUtils.doWithFiles(p, "**/Dockerfile", async f => {
+                        dockerfile = f.path;
+                    });
+                    return dockerfile;
+                },
+            },
         })
         .withProjectListener(MvnVersion)
         .withProjectListener(MvnPackage);

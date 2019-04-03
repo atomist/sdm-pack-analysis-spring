@@ -34,17 +34,12 @@ export interface BuildSystemStack extends TechnologyStack {
     /**
      * Which build system is used.
      */
-    buildSystem: "maven"|"gradle";
+    buildSystem: "maven" | "gradle";
 
     /**
      * Whether the project has a dockerfile
      */
     hasDockerFile: boolean;
-
-    /**
-     * The location of the dockerfile
-     */
-    dockerFile: string;
 }
 
 /**
@@ -68,7 +63,6 @@ export const buildSystemScanner: TechnologyScanner<BuildSystemStack> = async p =
         buildSystem: isGradle ? "gradle" : "maven",
         tags: isGradle ? ["gradle"] : ["maven"],
         hasDockerFile: !!dockerFile,
-        dockerFile,
     };
     return stack;
 };

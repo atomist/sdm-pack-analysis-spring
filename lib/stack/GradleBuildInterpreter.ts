@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import { projectUtils } from "@atomist/automation-client";
 import {
     AutofixRegistration,
     CodeInspectionRegistration,
     goals,
     isMaterialChange,
+    LogSuppressor,
 } from "@atomist/sdm";
 import { Version } from "@atomist/sdm-core";
 import {
@@ -28,7 +30,10 @@ import {
     Interpreter,
 } from "@atomist/sdm-pack-analysis";
 import { Build } from "@atomist/sdm-pack-build";
-import { DockerBuild } from "@atomist/sdm-pack-docker";
+import {
+    DockerBuild,
+    DockerProgressReporter,
+} from "@atomist/sdm-pack-docker";
 import {
     gradleBuilder,
 } from "@atomist/sdm-pack-spring";
@@ -62,6 +67,17 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
 
     private readonly dockerBuildGoal: DockerBuild = new DockerBuild()
         .with({
+            progressReporter: DockerProgressReporter,
+            logInterpreter: LogSuppressor,
+            options: {
+                dockerfileFinder: async p => {
+                    let dockerfile: string = "Dockerfile";
+                    await projectUtils.doWithFiles(p, "**/Dockerfile", async f => {
+                        dockerfile = f.path;
+                    });
+                    return dockerfile;
+                },
+            },
         })
         .withProjectListener(GradleVersion)
         .withProjectListener(GradleBuild);
@@ -72,7 +88,6 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
             return false;
         }
         const buildGoals = goals("build")
-            .plan(this.gradleVersionGoal)
             .plan(this.gradleVersionGoal)
             .plan(this.gradleBuildGoal).after(this.gradleVersionGoal);
         if (buildSystemStack.hasDockerFile) {
