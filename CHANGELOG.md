@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-pack-seed/compare/1.0.1...HEAD)
 
+### Added
+
+-   **BREAKING** Add Gradle support and trigger docker build if Dockerfile is present. [#3](https://github.com/atomist/sdm-pack-analysis-spring/issues/3)
+
 ## [1.0.1](https://github.com/atomist/sdm-pack-seed/compare/1.0.0...1.0.1) - 2019-03-30
 
 ## [1.0.0](https://github.com/atomist/sdm-pack-seed/tree/1.0.0) - 2019-03-20
