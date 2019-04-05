@@ -22,7 +22,13 @@ import {
     isMaterialChange,
     LogSuppressor,
 } from "@atomist/sdm";
-import { Version } from "@atomist/sdm-core";
+import {
+    cachePut,
+    cacheRemove,
+    cacheRestore,
+    GoalCacheOptions,
+    Version,
+} from "@atomist/sdm-core";
 import {
     AutofixRegisteringInterpreter,
     CodeInspectionRegisteringInterpreter,
@@ -36,6 +42,7 @@ import {
 } from "@atomist/sdm-pack-docker";
 import {
     gradleBuilder,
+    MvnVersion,
 } from "@atomist/sdm-pack-spring";
 import {
     GradleBuild,
@@ -55,12 +62,19 @@ import {
  */
 export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
+    private gradleJarCache: GoalCacheOptions = {
+        entries: [{classifier: "jars", pattern: "**/build/libs/*.jar"}],
+        onCacheMiss: [GradleVersion, GradleBuild],
+    };
+
     // This includes test goal
     private readonly gradleBuildGoal: Build = new Build()
         .with({
             ...GradleDefaultOptions,
             builder: gradleBuilder(),
-        });
+        })
+        .withProjectListener(GradleVersion)
+        .withProjectListener(cachePut(this.gradleJarCache));
 
     private readonly gradleVersionGoal: Version = new Version()
         .with({
@@ -82,8 +96,8 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
                 },
             },
         })
-        .withProjectListener(GradleVersion)
-        .withProjectListener(GradleBuild);
+        .withProjectListener(cacheRestore(this.gradleJarCache))
+        .withProjectListener(cacheRemove(this.gradleJarCache));
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
