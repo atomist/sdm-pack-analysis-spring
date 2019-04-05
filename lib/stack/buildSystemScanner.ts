@@ -24,6 +24,11 @@ import {
 } from "@atomist/sdm-pack-spring";
 import { IsGradle } from "@atomist/sdm-pack-spring/lib/gradle/pushtest/gradlePushTests";
 
+export enum BuildSystem {
+    maven,
+    gradle,
+}
+
 /**
  * Stack information on the used build system. Currently supports Gradle and Maven.
  */
@@ -34,7 +39,7 @@ export interface BuildSystemStack extends TechnologyStack {
     /**
      * Which build system is used.
      */
-    buildSystem: "maven" | "gradle";
+    buildSystem: BuildSystem;
 
     /**
      * Whether the project has a dockerfile
@@ -60,7 +65,7 @@ export const buildSystemScanner: TechnologyScanner<BuildSystemStack> = async p =
 
     const stack: BuildSystemStack = {
         name: "javabuild",
-        buildSystem: isGradle ? "gradle" : "maven",
+        buildSystem: isGradle ? BuildSystem.gradle : BuildSystem.maven,
         tags: isGradle ? ["gradle"] : ["maven"],
         hasDockerFile: !!dockerFile,
     };

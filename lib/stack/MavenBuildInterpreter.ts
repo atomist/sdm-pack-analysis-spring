@@ -41,7 +41,10 @@ import {
     MvnPackage,
     MvnVersion,
 } from "@atomist/sdm-pack-spring";
-import { BuildSystemStack } from "./buildSystemScanner";
+import {
+    BuildSystem,
+    BuildSystemStack,
+} from "./buildSystemScanner";
 
 /**
  * Interpreter that adds a Maven build goal when Maven is found in the project's interpretation.
@@ -81,7 +84,7 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
-        if (buildSystemStack.buildSystem !== "maven") {
+        if (buildSystemStack.buildSystem !== BuildSystem.maven) {
             return false;
         }
         interpretation.buildGoals = goals("build")

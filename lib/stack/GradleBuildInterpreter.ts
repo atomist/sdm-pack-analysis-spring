@@ -44,7 +44,10 @@ import {
     GradleVersion,
 } from "@atomist/sdm-pack-spring/lib/gradle/build/helpers";
 import { HasVersionDefinedInGradleProperties } from "@atomist/sdm-pack-spring/lib/gradle/review/hasGradleVersion";
-import { BuildSystemStack } from "./buildSystemScanner";
+import {
+    BuildSystem,
+    BuildSystemStack,
+} from "./buildSystemScanner";
 
 /**
  * Interpreter that adds a gradle build goal when Gradle is found in the project's interpretation.
@@ -84,7 +87,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
-        if (buildSystemStack.buildSystem !== "gradle") {
+        if (buildSystemStack.buildSystem !== BuildSystem.gradle) {
             return false;
         }
         const buildGoals = goals("build")
