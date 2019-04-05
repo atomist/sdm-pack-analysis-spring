@@ -14,5 +14,8 @@
  * limitations under the License.
  */
 
-export { springBootStackSupport } from "./lib/stack/springBootStackSupport";
+export {
+    javaSupport,
+    springBootStackSupport,
+} from "./lib/stack/springBootStackSupport";
 export { springBootScanner } from "./lib/stack/springBootScanner";
