@@ -27,7 +27,7 @@ import {
     cacheRemove,
     cacheRestore,
     GoalCacheOptions,
-    Version
+    Version,
 } from "@atomist/sdm-core";
 import {
     AutofixRegisteringInterpreter,
@@ -59,7 +59,7 @@ import {
  */
 export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
-    private mavenJarCache: GoalCacheOptions = {
+    private readonly mavenJarCache: GoalCacheOptions = {
         entries: [{classifier: "jars", pattern: "**/target/*.jar"}],
         onCacheMiss: [MvnVersion, MvnPackage],
     };

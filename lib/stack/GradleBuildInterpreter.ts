@@ -62,7 +62,7 @@ import {
  */
 export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
-    private gradleJarCache: GoalCacheOptions = {
+    private readonly gradleJarCache: GoalCacheOptions = {
         entries: [{classifier: "jars", pattern: "**/build/libs/*.jar"}],
         onCacheMiss: [GradleVersion, GradleBuild],
     };
