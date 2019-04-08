@@ -87,6 +87,9 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
+        if (!buildSystemStack) {
+            return false;
+        }
         if (buildSystemStack.buildSystem !== BuildSystem.gradle) {
             return false;
         }

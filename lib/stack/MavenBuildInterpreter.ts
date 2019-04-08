@@ -84,6 +84,9 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
 
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
+        if (!buildSystemStack) {
+            return false;
+        }
         if (buildSystemStack.buildSystem !== BuildSystem.maven) {
             return false;
         }
