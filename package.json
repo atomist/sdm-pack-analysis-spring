@@ -30,7 +30,7 @@
   "peerDependencies": {
     "@atomist/automation-client": ">=1.3.0",
     "@atomist/sdm": ">=1.3.0",
-    "@atomist/sdm-core": ">=1.3.0",
+    "@atomist/sdm-core": ">=1.5.0",
     "@atomist/sdm-pack-analysis": ">=1.0.0",
     "@atomist/sdm-pack-spring": ">=2.0.0",
     "@atomist/sdm-pack-build": ">=1.0.4",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@atomist/automation-client": "^1.3.0",
     "@atomist/sdm": "^1.3.0",
-    "@atomist/sdm-core": "^1.3.0",
+    "@atomist/sdm-core": "^1.5.0-master.20190405152409",
     "@atomist/sdm-pack-analysis": "^1.0.0",
     "@atomist/sdm-pack-build": "^1.0.4",
     "@atomist/sdm-pack-docker": "^1.1.0",
