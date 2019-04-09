@@ -1,4 +1,7 @@
-# @atomist-seeds/sdm-pack-analysis-spring
+# @atomist/sdm-pack-analysis-spring
+
+[![atomist sdm goals](https://badge.atomist.com/T29E48P34/atomist/sdm-pack-analysis-spring/84bf0b30-68a5-47ec-a466-283e571999b7)](https://app.atomist.com/workspace/T29E48P34)
+[![npm version](https://img.shields.io/npm/v/@atomist/sdm-pack-analysis-spring.svg)](https://www.npmjs.com/package/@atomist/sdm-pack-analysis-spring)
 
 This pack contains interpreters and scanners, adding Spring stack support to
 the `sdm-pack-analysis` extension pack.
