@@ -17,7 +17,6 @@
 import { logger } from "@atomist/automation-client";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
 import { StackSupport } from "@atomist/sdm-pack-analysis";
-import { RunCondition } from "@atomist/sdm-pack-analysis/lib/analysis/ProjectAnalyzer";
 import { Categories } from "@atomist/sdm-pack-spring";
 import * as _ from "lodash";
 import { buildSystemScanner } from "./buildSystemScanner";
@@ -27,21 +26,11 @@ import { SpringBootMavenTransformRecipeContributor } from "./SpringBootMavenTran
 import { springBootScanner } from "./springBootScanner";
 import { SpringReviewInterpreter } from "./SpringReviewInterpreter";
 
-export interface SpringBootStackSupportOptions {
-
-    /**
-     * When should the capabilities of this stack take effect?
-     * Enable feature flagging
-     */
-    condition?: RunCondition;
-
-}
-
 /**
  * Java stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
  * @return {StackSupport}
  */
-export function javaSupport(): StackSupport {
+export function javaStackSupport(): StackSupport {
     return {
         scanners: [buildSystemScanner],
         interpreters: [
@@ -57,8 +46,7 @@ export function javaSupport(): StackSupport {
  * Uses sdm.spring.deployLocally and sdm.spring.review, to be used with the javaSupport stack.
  * @return {StackSupport}
  */
-export function springBootStackSupport(configuration: SoftwareDeliveryMachineConfiguration,
-                                       opts: SpringBootStackSupportOptions = {}): StackSupport {
+export function springBootStackSupport(configuration: SoftwareDeliveryMachineConfiguration): StackSupport {
     const reviewCategories: Categories = _.get(configuration, "sdm.spring.review", {
         springStyle: true,
         cloudNative: true,
@@ -74,6 +62,5 @@ export function springBootStackSupport(configuration: SoftwareDeliveryMachineCon
             optional: false,
             contributor: new SpringBootMavenTransformRecipeContributor(),
         }],
-        condition: opts.condition,
     };
 }

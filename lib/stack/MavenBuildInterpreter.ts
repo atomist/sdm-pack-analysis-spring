@@ -108,7 +108,7 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
             .plan(this.mavenVersionGoal)
             .plan(this.mavenBuildGoal).after(this.mavenVersionGoal);
         if (buildSystemStack.hasDockerFile) {
-            interpretation.containerBuildGoals = goals("docker-build")
+            interpretation.containerBuildGoals = goals("docker build")
                 .plan(this.dockerBuildGoal);
         }
         interpretation.materialChangePushTests.push(isMaterialChange({

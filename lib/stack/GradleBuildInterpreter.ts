@@ -111,7 +111,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
             .plan(this.gradleVersionGoal)
             .plan(this.gradleBuildGoal).after(this.gradleVersionGoal);
         if (buildSystemStack.hasDockerFile) {
-            interpretation.containerBuildGoals = goals("docker-build")
+            interpretation.containerBuildGoals = goals("docker build")
                 .plan(this.dockerBuildGoal);
         }
         interpretation.buildGoals = buildGoals;
