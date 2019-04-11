@@ -22,9 +22,9 @@ import * as _ from "lodash";
 import { buildSystemScanner } from "./buildSystemScanner";
 import { GradleBuildInterpreter } from "./GradleBuildInterpreter";
 import { MavenBuildInterpreter } from "./MavenBuildInterpreter";
+import { SpringBootInterpreter } from "./SpringBootInterpreter";
 import { SpringBootMavenTransformRecipeContributor } from "./SpringBootMavenTransformRecipeContributor";
 import { springBootScanner } from "./springBootScanner";
-import { SpringBootInterpreter } from "./SpringBootInterpreter";
 
 /**
  * Java stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
