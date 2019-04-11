@@ -19,6 +19,7 @@ import {
     SdmContext,
 } from "@atomist/sdm";
 import {
+    CodeInspectionRegisteringInterpreter,
     Interpretation,
     Interpreter,
 } from "@atomist/sdm-pack-analysis";
@@ -33,19 +34,30 @@ import {
     ProvidedDependencyReviewer,
     UnnecessaryComponentScanReviewer,
 } from "@atomist/sdm-pack-spring";
+import { SpringBootStack } from "./springBootScanner";
+
 /**
- * Review every push with with Spring specific inspections.
+ * Review every push with with Spring specific support.
  */
-export class SpringReviewInterpreter implements Interpreter {
+export class SpringBootInterpreter implements Interpreter, CodeInspectionRegisteringInterpreter {
 
     public readonly categories: Categories;
 
+    public constructor(categories: Categories) {
+        this.categories = categories;
+    }
+
     public async enrich(interpretation: Interpretation, sdmContext: SdmContext): Promise<boolean> {
-        interpretation.inspections.push(...this.getCodeInspections());
+        const springBootStack = interpretation.reason.analysis.elements.springboot as SpringBootStack;
+        if (!springBootStack) {
+            return false;
+        }
+
+        interpretation.inspections.push(...this.codeInspections);
         return true;
     }
 
-    public getCodeInspections(): Array<AutoInspectRegistration<any, any>> {
+    get codeInspections(): Array<AutoInspectRegistration<any, any>> {
         const codeInspections: Array<AutoInspectRegistration<any, any>> = [];
         if (this.categories.cloudNative) {
             codeInspections.push(ImportIoFileReviewer);
@@ -62,8 +74,5 @@ export class SpringReviewInterpreter implements Interpreter {
         return codeInspections;
     }
 
-    public constructor(categories: Categories) {
-        this.categories = categories;
-    }
-
+    // TODO add support for Spring Format
 }

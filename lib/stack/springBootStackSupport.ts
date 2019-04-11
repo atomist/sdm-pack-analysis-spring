@@ -24,7 +24,7 @@ import { GradleBuildInterpreter } from "./GradleBuildInterpreter";
 import { MavenBuildInterpreter } from "./MavenBuildInterpreter";
 import { SpringBootMavenTransformRecipeContributor } from "./SpringBootMavenTransformRecipeContributor";
 import { springBootScanner } from "./springBootScanner";
-import { SpringReviewInterpreter } from "./SpringReviewInterpreter";
+import { SpringBootInterpreter } from "./SpringBootInterpreter";
 
 /**
  * Java stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
@@ -51,11 +51,11 @@ export function springBootStackSupport(configuration: SoftwareDeliveryMachineCon
         springStyle: true,
         cloudNative: true,
     });
-    logger.info("Spring pack: Review categories=%j", reviewCategories);
+
     return {
         scanners: [springBootScanner],
         interpreters: [
-            new SpringReviewInterpreter(reviewCategories),
+            new SpringBootInterpreter(reviewCategories),
         ],
         transformRecipeContributors: [{
             originator: "spring-boot-maven",
