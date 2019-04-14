@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
 import { StackSupport } from "@atomist/sdm-pack-analysis";
 import { Categories } from "@atomist/sdm-pack-spring";
 import * as _ from "lodash";
-import { buildSystemScanner } from "./buildSystemScanner";
+import { BuildSystemScanner } from "./buildSystemScanner";
 import { GradleBuildInterpreter } from "./GradleBuildInterpreter";
 import { MavenBuildInterpreter } from "./MavenBuildInterpreter";
 import { SpringBootInterpreter } from "./SpringBootInterpreter";
 import { SpringBootMavenTransformRecipeContributor } from "./SpringBootMavenTransformRecipeContributor";
-import { springBootScanner } from "./springBootScanner";
+import { SpringBootScanner } from "./springBootScanner";
 
 /**
  * Java stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
@@ -32,7 +31,7 @@ import { springBootScanner } from "./springBootScanner";
  */
 export function javaStackSupport(): StackSupport {
     return {
-        scanners: [buildSystemScanner],
+        scanners: [new BuildSystemScanner()],
         interpreters: [
             new GradleBuildInterpreter(),
             new MavenBuildInterpreter(),
@@ -53,7 +52,7 @@ export function springBootStackSupport(configuration: SoftwareDeliveryMachineCon
     });
 
     return {
-        scanners: [springBootScanner],
+        scanners: [new SpringBootScanner()],
         interpreters: [
             new SpringBootInterpreter(reviewCategories),
         ],

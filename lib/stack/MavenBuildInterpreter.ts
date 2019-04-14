@@ -101,7 +101,7 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
         if (!buildSystemStack) {
             return false;
         }
-        if (buildSystemStack.buildSystem !== BuildSystem.maven) {
+        if (buildSystemStack.buildSystem !== BuildSystem.Maven) {
             return false;
         }
         interpretation.buildGoals = goals("build")

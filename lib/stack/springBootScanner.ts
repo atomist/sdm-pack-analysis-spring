@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
+import { SdmContext } from "@atomist/sdm";
 import {
+    FastProject,
     TechnologyScanner,
     TechnologyStack,
 } from "@atomist/sdm-pack-analysis";
+import {
+    PhasedTechnologyScanner,
+    TechnologyClassification,
+} from "@atomist/sdm-pack-analysis/lib/analysis/TechnologyScanner";
 import {
     HasSpringBootPom,
     IsMaven,
@@ -38,6 +44,28 @@ export interface SpringBootStack extends TechnologyStack {
 
     // TODO add starters
 
+}
+
+export class SpringBootScanner implements PhasedTechnologyScanner<SpringBootStack> {
+
+    public async classify(p: FastProject, ctx: SdmContext): Promise<TechnologyClassification | undefined> {
+        const pom = await p.getFile("pom.xml");
+        if (!!pom) {
+            const isBoot = (await pom.getContent()).includes("spring-boot");
+            if (!isBoot) {
+                return {
+                    name: "springboot",
+                    tags: ["spring", "spring-boot"],
+                    messages: [],
+                };
+            }
+        }
+        return undefined;
+    }
+
+    get scan(): TechnologyScanner<SpringBootStack> {
+        return springBootScanner;
+    }
 }
 
 export const springBootScanner: TechnologyScanner<SpringBootStack> = async p => {

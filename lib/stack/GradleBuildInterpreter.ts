@@ -42,7 +42,7 @@ import {
 } from "@atomist/sdm-pack-docker";
 import {
     gradleBuilder,
-    MvnVersion,
+    GradleVersionInspection,
 } from "@atomist/sdm-pack-spring";
 import {
     GradleBuild,
@@ -50,7 +50,6 @@ import {
     GradleProjectVersioner,
     GradleVersion,
 } from "@atomist/sdm-pack-spring/lib/gradle/build/helpers";
-import { HasVersionDefinedInGradleProperties } from "@atomist/sdm-pack-spring/lib/gradle/review/hasGradleVersion";
 import {
     BuildSystem,
     BuildSystemStack,
@@ -104,7 +103,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
         if (!buildSystemStack) {
             return false;
         }
-        if (buildSystemStack.buildSystem !== BuildSystem.gradle) {
+        if (buildSystemStack.buildSystem !== BuildSystem.Gradle) {
             return false;
         }
         const buildGoals = goals("build")
@@ -119,6 +118,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
             extensions: ["java", "kt", "kts", "xml", "properties", "gradle", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],
         }));
+        interpretation.inspections.push(...this.codeInspections);
         return true;
     }
 
@@ -128,7 +128,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
 
     get codeInspections(): Array<CodeInspectionRegistration<any>> {
         return [
-            HasVersionDefinedInGradleProperties,
+            GradleVersionInspection,
         ];
     }
 }

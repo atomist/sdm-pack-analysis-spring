@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-import { projectUtils } from "@atomist/automation-client";
 import {
+    Project,
+    projectUtils,
+} from "@atomist/automation-client";
+import { SdmContext } from "@atomist/sdm";
+import {
+    FastProject,
     TechnologyScanner,
     TechnologyStack,
 } from "@atomist/sdm-pack-analysis";
 import {
-    IsMaven,
-} from "@atomist/sdm-pack-spring";
+    PhasedTechnologyScanner,
+    TechnologyClassification,
+} from "@atomist/sdm-pack-analysis/lib/analysis/TechnologyScanner";
+import { IsMaven } from "@atomist/sdm-pack-spring";
 import { IsGradle } from "@atomist/sdm-pack-spring/lib/gradle/pushtest/gradlePushTests";
 
 export enum BuildSystem {
-    maven,
-    gradle,
+    Maven,
+    Gradle,
 }
 
 /**
@@ -47,13 +54,49 @@ export interface BuildSystemStack extends TechnologyStack {
     hasDockerFile: boolean;
 }
 
+export class BuildSystemScanner implements PhasedTechnologyScanner<BuildSystemStack> {
+
+    public async classify(p: FastProject, ctx: SdmContext): Promise<TechnologyClassification | undefined> {
+        return classify(p);
+    }
+
+    get scan(): TechnologyScanner<BuildSystemStack> {
+        return buildSystemScanner;
+    }
+}
+
+/**
+ * Classify the provided project
+ */
+async function classify(p: FastProject): Promise<TechnologyClassification> {
+    const isMaven = await p.hasFile("pom.xml");
+    if (!!isMaven) {
+        return {
+            name: "maven",
+            tags: ["maven"],
+            messages: [],
+        };
+    }
+
+    const isGradle = await p.hasFile("build.gradle") || await p.hasFile("build.gradle.kts");
+    if (!!isGradle) {
+        return {
+            name: "gradle",
+            tags: ["gradle"],
+            messages: [],
+        };
+    }
+
+    return undefined;
+}
+
 /**
  * Scanner that adds build system information to the interpretation.
- * @param p The project to be scanned.
  */
-export const buildSystemScanner: TechnologyScanner<BuildSystemStack> = async p => {
+export async function buildSystemScanner(p: Project): Promise<BuildSystemStack> {
     const isMaven = await IsMaven.predicate(p);
     const isGradle = await IsGradle.predicate(p);
+
     let dockerFile: string;
     await projectUtils.doWithFiles(p, "**/Dockerfile", f => {
         dockerFile = f.path;
@@ -65,9 +108,10 @@ export const buildSystemScanner: TechnologyScanner<BuildSystemStack> = async p =
 
     const stack: BuildSystemStack = {
         name: "javabuild",
-        buildSystem: isGradle ? BuildSystem.gradle : BuildSystem.maven,
+        buildSystem: isGradle ? BuildSystem.Gradle : BuildSystem.Maven,
         tags: isGradle ? ["gradle"] : ["maven"],
         hasDockerFile: !!dockerFile,
     };
+
     return stack;
-};
+}
