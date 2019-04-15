@@ -27,6 +27,7 @@ import {
     cacheRemove,
     cacheRestore,
     GoalCacheOptions,
+    Tag,
     Version,
 } from "@atomist/sdm-core";
 import {
@@ -96,6 +97,8 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
         .withProjectListener(cacheRestore(this.mavenJarCache))
         .withProjectListener(cacheRemove(this.mavenJarCache));
 
+    private readonly tagGoal: Tag = new Tag();
+
     public async enrich(interpretation: Interpretation): Promise<boolean> {
         const buildSystemStack = interpretation.reason.analysis.elements.javabuild as BuildSystemStack;
         if (!buildSystemStack) {
@@ -111,6 +114,7 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
             interpretation.containerBuildGoals = goals("docker build")
                 .plan(this.dockerBuildGoal);
         }
+        interpretation.releaseGoals = goals("release").plan(this.tagGoal);
         interpretation.materialChangePushTests.push(isMaterialChange({
             extensions: ["java", "kt", "kts", "xml", "properties", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],

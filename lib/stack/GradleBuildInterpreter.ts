@@ -27,6 +27,7 @@ import {
     cacheRemove,
     cacheRestore,
     GoalCacheOptions,
+    Tag,
     Version,
 } from "@atomist/sdm-core";
 import {
@@ -75,6 +76,8 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
         .withProjectListener(GradleVersion)
         .withProjectListener(cachePut(this.gradleJarCache));
 
+    private readonly tagGoal: Tag = new Tag();
+
     private readonly gradleVersionGoal: Version = new Version()
         .with({
             ...GradleDefaultOptions,
@@ -114,6 +117,7 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
                 .plan(this.dockerBuildGoal);
         }
         interpretation.buildGoals = buildGoals;
+        interpretation.releaseGoals = goals("release").plan(this.tagGoal);
         interpretation.materialChangePushTests.push(isMaterialChange({
             extensions: ["java", "kt", "kts", "xml", "properties", "gradle", "yml", "json", "pug", "html", "css", "Dockerfile"],
             directories: [".atomist"],
