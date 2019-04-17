@@ -17,5 +17,5 @@
 export {
     springBootStackSupport,
     javaStackSupport,
-} from "./lib/stack/springBootStackSupport";
+} from "./lib/stack/stackSupport";
 export { springBootScanner } from "./lib/stack/springBootScanner";

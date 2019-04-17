@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
+import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import { StackSupport } from "@atomist/sdm-pack-analysis";
 import { Categories } from "@atomist/sdm-pack-spring";
 import * as _ from "lodash";
@@ -29,7 +29,7 @@ import { SpringBootScanner } from "./springBootScanner";
  * Java stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
  * @return {StackSupport}
  */
-export function javaStackSupport(): StackSupport {
+export function javaStackSupport(sdm: SoftwareDeliveryMachine): StackSupport {
     return {
         scanners: [new BuildSystemScanner()],
         interpreters: [
@@ -45,8 +45,8 @@ export function javaStackSupport(): StackSupport {
  * Uses sdm.spring.deployLocally and sdm.spring.review, to be used with the javaSupport stack.
  * @return {StackSupport}
  */
-export function springBootStackSupport(configuration: SoftwareDeliveryMachineConfiguration): StackSupport {
-    const reviewCategories: Categories = _.get(configuration, "sdm.spring.review", {
+export function springBootStackSupport(sdm: SoftwareDeliveryMachine): StackSupport {
+    const reviewCategories: Categories = _.get(sdm.configuration, "sdm.spring.review", {
         springStyle: true,
         cloudNative: true,
     });
