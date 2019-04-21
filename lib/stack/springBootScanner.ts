@@ -16,6 +16,7 @@
 
 import { SdmContext } from "@atomist/sdm";
 import {
+    Dependency,
     FastProject,
     TechnologyScanner,
     TechnologyStack,
@@ -25,11 +26,13 @@ import {
     TechnologyClassification,
 } from "@atomist/sdm-pack-analysis/lib/analysis/TechnologyScanner";
 import {
+    findDependenciesFromEffectivePom,
     HasSpringBootPom,
     IsMaven,
     SpringBootProjectStructure,
     SpringBootVersionInspection,
 } from "@atomist/sdm-pack-spring";
+import { logger } from "@atomist/automation-client";
 
 export interface SpringBootStack extends TechnologyStack {
 
@@ -68,7 +71,7 @@ export class SpringBootScanner implements PhasedTechnologyScanner<SpringBootStac
     }
 }
 
-export const springBootScanner: TechnologyScanner<SpringBootStack> = async p => {
+export const springBootScanner: TechnologyScanner<SpringBootStack> = async (p, ctx, analysis, opts) => {
     const isMaven = await IsMaven.predicate(p);
     if (isMaven) {
         const isBoot = await HasSpringBootPom.predicate(p);
@@ -81,12 +84,23 @@ export const springBootScanner: TechnologyScanner<SpringBootStack> = async p => 
         }
         const versions = await SpringBootVersionInspection(p, undefined);
 
+        // Only compute dependencies in a full analysis
+        let dependencies: Dependency[];
+        try {
+            dependencies = opts.full ?
+                await findDependenciesFromEffectivePom(p) :
+                undefined;
+        } catch (err) {
+            logger.warn("Unable to find dependencies for project at %s", p.id.url, err.msg);
+        }
+
         return {
             // TODO get from Maven POM
             projectName: structure.applicationClass,
             name: "springboot",
             tags: ["spring", "spring-boot"],
             structure,
+            dependencies,
             version: versions.versions.length > 0 ? versions.versions[0].version : undefined,
             // TODO gather this from properties and YAML
             referencedEnvironmentVariables: [],
