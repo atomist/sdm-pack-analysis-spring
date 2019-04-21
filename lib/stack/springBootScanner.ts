@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import { SdmContext } from "@atomist/sdm";
 import {
     Dependency,
@@ -32,7 +33,6 @@ import {
     SpringBootProjectStructure,
     SpringBootVersionInspection,
 } from "@atomist/sdm-pack-spring";
-import { logger } from "@atomist/automation-client";
 
 export interface SpringBootStack extends TechnologyStack {
 
