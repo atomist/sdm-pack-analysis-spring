@@ -45,7 +45,10 @@ export interface SpringBootStack extends TechnologyStack {
 
     structure: SpringBootProjectStructure;
 
-    // TODO add starters
+    /**
+     * If this is a full analysis, the Spring Boot starters we found in the effective POM
+     */
+    starters?: Dependency[];
 
 }
 
@@ -93,6 +96,9 @@ export const springBootScanner: TechnologyScanner<SpringBootStack> = async (p, c
         } catch (err) {
             logger.warn("Unable to find dependencies for project at %s", p.id.url, err.msg);
         }
+        const starters = !!dependencies ?
+            dependencies.filter(s => s.artifact.includes("starter")) :
+            undefined;
 
         return {
             // TODO get from Maven POM
@@ -101,6 +107,7 @@ export const springBootScanner: TechnologyScanner<SpringBootStack> = async (p, c
             tags: ["spring", "spring-boot"],
             structure,
             dependencies,
+            starters,
             version: versions.versions.length > 0 ? versions.versions[0].version : undefined,
             // TODO gather this from properties and YAML
             referencedEnvironmentVariables: [],
