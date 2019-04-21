@@ -39,7 +39,7 @@ describe("springBootScanner", () => {
         assert(projectAnalysis.starters.length > 0);
         projectAnalysis.starters.forEach(s =>
             assert(s.artifact.includes("starter"), `Non-starter \`${s.artifact}\``));
-    }).timeout(40000);
+    }).timeout(400000);
 
 });
 
