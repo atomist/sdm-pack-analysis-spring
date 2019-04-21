@@ -30,7 +30,7 @@ describe("springBootScanner", () => {
         const p = await GitCommandGitProject.cloned(undefined, SpringRestSeed);
         const projectAnalysis = await springBootScanner(p, undefined, undefined, { full: false });
         assert(!projectAnalysis.starters);
-    }).timeout(10000);
+    }).timeout(40000);
 
     it("finds starters in full scan", async () => {
         const p = await GitCommandGitProject.cloned(undefined, SpringRestSeed);
@@ -39,7 +39,7 @@ describe("springBootScanner", () => {
         assert(projectAnalysis.starters.length > 0);
         projectAnalysis.starters.forEach(s =>
             assert(s.artifact.includes("starter"), `Non-starter \`${s.artifact}\``));
-    }).timeout(10000);
+    }).timeout(40000);
 
 });
 
