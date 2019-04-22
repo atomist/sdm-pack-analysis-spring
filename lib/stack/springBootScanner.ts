@@ -46,14 +46,24 @@ export interface SpringBootStack extends TechnologyStack {
     structure: SpringBootProjectStructure;
 
     /**
-     * If this is a full analysis, the Spring Boot starters we found in the effective POM
+     * If this is a full analysis, the Spring Boot starters we found in the effective POM.
      */
     starters?: Dependency[];
 
 }
 
+/**
+ * Scan for Spring Boot projects. Currently recognizes only
+ * Maven projects.
+ */
 export class SpringBootScanner implements PhasedTechnologyScanner<SpringBootStack> {
 
+    /**
+     * Cheaply establish whether this is a Spring Boot project
+     * @param {FastProject} p
+     * @param {SdmContext} ctx
+     * @return {Promise<TechnologyClassification | undefined>}
+     */
     public async classify(p: FastProject, ctx: SdmContext): Promise<TechnologyClassification | undefined> {
         const pom = await p.getFile("pom.xml");
         if (!!pom) {
@@ -96,7 +106,7 @@ export const springBootScanner: TechnologyScanner<SpringBootStack> = async (p, c
         } catch (err) {
             logger.warn("Unable to find dependencies for project at %s", p.id.url, err.msg);
         }
-        const starters = !!dependencies ?
+        const starters = !!dependencies && dependencies.some(d => d.artifact === "spring-boot-starter") ?
             dependencies.filter(s => s.artifact.includes("starter")) :
             undefined;
 
@@ -112,7 +122,8 @@ export const springBootScanner: TechnologyScanner<SpringBootStack> = async (p, c
             // TODO gather this from properties and YAML
             referencedEnvironmentVariables: [],
         };
-    } else {
-        return undefined;
     }
+
+    // If we got here, we didn't understand anything
+    return undefined;
 };
