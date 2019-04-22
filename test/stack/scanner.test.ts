@@ -39,6 +39,9 @@ describe("springBootScanner", () => {
         assert(projectAnalysis.starters.length > 0);
         projectAnalysis.starters.forEach(s =>
             assert(s.artifact.includes("starter"), `Non-starter \`${s.artifact}\``));
+        projectAnalysis.starters.forEach(s =>
+            assert(projectAnalysis.dependencies.some(d => d.artifact === s.artifact),
+                `Starter \`${s.artifact}\` not copied to top level dependencies`));
     }).timeout(400000);
 
 });
