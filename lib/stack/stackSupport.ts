@@ -40,16 +40,20 @@ export function javaStackSupport(sdm: SoftwareDeliveryMachine): StackSupport {
     };
 }
 
+const defaultCategories: Categories = {
+    springStyle: true,
+    cloudNative: true,
+};
+
 /**
  * Spring stack support based on sdm-pack-analysis. Used in Uhura-based SDMs.
  * Uses sdm.spring.deployLocally and sdm.spring.review, to be used with the javaSupport stack.
  * @return {StackSupport}
  */
 export function springBootStackSupport(sdm: SoftwareDeliveryMachine): StackSupport {
-    const reviewCategories: Categories = _.get(sdm.configuration, "sdm.spring.review", {
-        springStyle: true,
-        cloudNative: true,
-    });
+    const reviewCategories: Categories = !!sdm ?
+        _.get(sdm.configuration, "sdm.spring.review", defaultCategories) :
+        defaultCategories;
 
     return {
         scanners: [new SpringBootScanner()],
