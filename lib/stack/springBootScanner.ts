@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import { SdmContext } from "@atomist/sdm";
 import {
+    Dependency,
     FastProject,
     TechnologyScanner,
     TechnologyStack,
@@ -25,6 +27,7 @@ import {
     TechnologyClassification,
 } from "@atomist/sdm-pack-analysis/lib/analysis/TechnologyScanner";
 import {
+    findDependenciesFromEffectivePom,
     HasSpringBootPom,
     IsMaven,
     SpringBootProjectStructure,
@@ -42,12 +45,25 @@ export interface SpringBootStack extends TechnologyStack {
 
     structure: SpringBootProjectStructure;
 
-    // TODO add starters
+    /**
+     * If this is a full analysis, the Spring Boot starters we found in the effective POM.
+     */
+    starters?: Dependency[];
 
 }
 
+/**
+ * Scan for Spring Boot projects. Currently recognizes only
+ * Maven projects.
+ */
 export class SpringBootScanner implements PhasedTechnologyScanner<SpringBootStack> {
 
+    /**
+     * Cheaply establish whether this is a Spring Boot project
+     * @param {FastProject} p
+     * @param {SdmContext} ctx
+     * @return {Promise<TechnologyClassification | undefined>}
+     */
     public async classify(p: FastProject, ctx: SdmContext): Promise<TechnologyClassification | undefined> {
         const pom = await p.getFile("pom.xml");
         if (!!pom) {
@@ -68,7 +84,7 @@ export class SpringBootScanner implements PhasedTechnologyScanner<SpringBootStac
     }
 }
 
-export const springBootScanner: TechnologyScanner<SpringBootStack> = async p => {
+export const springBootScanner: TechnologyScanner<SpringBootStack> = async (p, ctx, analysis, opts) => {
     const isMaven = await IsMaven.predicate(p);
     if (isMaven) {
         const isBoot = await HasSpringBootPom.predicate(p);
@@ -81,17 +97,33 @@ export const springBootScanner: TechnologyScanner<SpringBootStack> = async p => 
         }
         const versions = await SpringBootVersionInspection(p, undefined);
 
+        // Only compute dependencies in a full analysis
+        let dependencies: Dependency[];
+        try {
+            dependencies = opts.full ?
+                await findDependenciesFromEffectivePom(p) :
+                undefined;
+        } catch (err) {
+            logger.warn("Unable to find dependencies for project at %s", p.id.url, err.msg);
+        }
+        const starters = !!dependencies && dependencies.some(d => d.artifact === "spring-boot-starter") ?
+            dependencies.filter(s => s.artifact.includes("starter")) :
+            undefined;
+
         return {
             // TODO get from Maven POM
             projectName: structure.applicationClass,
             name: "springboot",
             tags: ["spring", "spring-boot"],
             structure,
+            dependencies,
+            starters,
             version: versions.versions.length > 0 ? versions.versions[0].version : undefined,
             // TODO gather this from properties and YAML
             referencedEnvironmentVariables: [],
         };
-    } else {
-        return undefined;
     }
+
+    // If we got here, we didn't understand anything
+    return undefined;
 };
