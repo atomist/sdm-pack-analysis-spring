@@ -84,15 +84,6 @@ export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInt
         .with({
             progressReporter: DockerProgressReporter,
             logInterpreter: LogSuppressor,
-            options: {
-                dockerfileFinder: async p => {
-                    let dockerfile: string = "Dockerfile";
-                    await projectUtils.doWithFiles(p, "**/Dockerfile", async f => {
-                        dockerfile = f.path;
-                    });
-                    return dockerfile;
-                },
-            },
         })
         .withProjectListener(cacheRestore(this.mavenJarCache))
         .withProjectListener(cacheRemove(this.mavenJarCache));

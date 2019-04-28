@@ -97,10 +97,7 @@ export async function buildSystemScanner(p: Project): Promise<BuildSystemStack> 
     const isMaven = await IsMaven.predicate(p);
     const isGradle = await IsGradle.predicate(p);
 
-    let dockerFile: string;
-    await projectUtils.doWithFiles(p, "**/Dockerfile", f => {
-        dockerFile = f.path;
-    });
+    const dockerFile = await p.hasFile("Dockerfile") ? "Dockerfile" : undefined;
 
     if (!isMaven && !isGradle) {
         return undefined;

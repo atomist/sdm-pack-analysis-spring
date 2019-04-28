@@ -88,15 +88,6 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
         .with({
             progressReporter: DockerProgressReporter,
             logInterpreter: LogSuppressor,
-            options: {
-                dockerfileFinder: async p => {
-                    let dockerfile: string = "Dockerfile";
-                    await projectUtils.doWithFiles(p, "**/Dockerfile", async f => {
-                        dockerfile = f.path;
-                    });
-                    return dockerfile;
-                },
-            },
         })
         .withProjectListener(cacheRestore(this.gradleJarCache))
         .withProjectListener(cacheRemove(this.gradleJarCache));
