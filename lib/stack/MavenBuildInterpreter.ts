@@ -61,7 +61,7 @@ import {
 export class MavenBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
     private readonly mavenJarCache: GoalCacheOptions = {
-        entries: [{classifier: "jars", pattern: "**/target/*.jar"}],
+        entries: [{classifier: "jars", pattern: {globPattern: "**/target/*.jar"}}],
         onCacheMiss: [MvnVersion, MvnPackage],
     };
 
