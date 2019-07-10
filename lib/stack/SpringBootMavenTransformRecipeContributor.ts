@@ -27,7 +27,7 @@ import {
 import {
     HasSpringBootPom,
     SpringProjectCreationParameterDefinitions,
-    TransformSeedToCustomProject,
+    TransformMavenSpringBootSeedToCustomProject,
 } from "@atomist/sdm-pack-spring";
 
 /**
@@ -47,7 +47,7 @@ export class SpringBootMavenTransformRecipeContributor implements TransformRecip
         return {
             parameters,
             transforms: [
-                TransformSeedToCustomProject,
+                ...TransformMavenSpringBootSeedToCustomProject,
             ],
         };
     }

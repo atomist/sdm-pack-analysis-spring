@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { projectUtils } from "@atomist/automation-client";
 import {
     AutofixRegistration,
     CodeInspectionRegistration,
@@ -43,7 +42,6 @@ import {
 } from "@atomist/sdm-pack-docker";
 import {
     gradleBuilder,
-    GradleVersionInspection,
 } from "@atomist/sdm-pack-spring";
 import {
     GradleBuild,
@@ -63,7 +61,7 @@ import {
 export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringInterpreter, CodeInspectionRegisteringInterpreter {
 
     private readonly gradleJarCache: GoalCacheOptions = {
-        entries: [{classifier: "jars", pattern: "**/build/libs/*.jar"}],
+        entries: [{classifier: "jars", pattern: {globPattern: "**/build/libs/*.jar"}}],
         onCacheMiss: [GradleVersion, GradleBuild],
     };
 
@@ -122,8 +120,6 @@ export class GradleBuildInterpreter implements Interpreter, AutofixRegisteringIn
     }
 
     get codeInspections(): Array<CodeInspectionRegistration<any>> {
-        return [
-            GradleVersionInspection,
-        ];
+        return [];
     }
 }
